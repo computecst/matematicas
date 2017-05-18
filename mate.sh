@@ -5,7 +5,8 @@
 DIA=`date +"%d/%m/%Y"`
 HORA=`date +"%H:%M"`
 APACHE=`apt-get install apache2 -y >> /dev/null`
-#POSTGRESQL=`apt-get install apache2 -y >> /dev/null`
+POSTGRESQL=`apt-get install postgresql postgresql-client -y >> /dev/null`
+MYSQL=`apt-get install mysql-common mysql-client-5.5 mysql-server-5.5 -y`
 PHP=`apt-get install php7.0 php7.0-common php7.0-dba php7.0 -y >> /dev/null`
 VIRTUALENVIRONMENT="/etc/apache2/sites-available/"
 NAME_VIRTUALENVIRONMENT="webapplication"
@@ -14,6 +15,7 @@ URL_WEB_APP="/var/www/html/"$NAME_VIRTUALENVIRONMENT
 #exit
 URL_CODEIGNITER="wget -O code.zip https://github.com/bcit-ci/CodeIgniter/archive/3.1.4.zip"
 
+#DOWNLOAD_CODEIGNITER="wget -O code.zip $URL_CODEIGNITER | unzip code.zip >> /dev/null | cd CodeIgniter-3.1.4 | mv * ./../ | cd .. | rm -r CodeIgniter-3.1.4"
 
 ##### Argumentos
 VERBOSE=$1
@@ -92,44 +94,28 @@ if $APACHE; then
 				mkdir $URL_WEB_APP"/log"
 				cd $URL_WEB_APP
                         	#pwd
-				wget -O code.zip $URL_CODEIGNITER
-				unzip code.zip
+				$URL_CODEIGNITER
+				unzip code.zip >> /dev/null
                         	cd "CodeIgniter-3.1.4"
                         	mv * ./../
                         	cd ..
                         	rm -r "CodeIgniter-3.1.4"
+				#$OWNLOAD_CODEIGNITER
 			fi
 			
 			# configuracion del entorno virtual
-
-			if [ -d $VIRTUALENVIRONMENT$NAME_VIRTUALENVIRONMENT".conf" ]; then
+			if [ -f $VIRTUALENVIRONMENT$NAME_VIRTUALENVIRONMENT".conf" ]; then
 				/usr/bin/firefox -new-window $NAME_VIRTUALENVIRONMENT".loc"
 			else
 				config_virtual_environment
 				/usr/bin/firefox -new-window $NAME_VIRTUALENVIRONMENT".loc"
 			fi
-			
-
-			#cd $URL_WEB_APP
-			#pwd
-			#wget -O code.zip $URL_CODEIGNITER
-			#pwd
-			#unzip code.zip
-			#cd "CodeIgniter-3.1.4"
-			#mv * ./../
-			#cd ..
-			#rm -r "CodeIgniter-3.1.4"
-			#echo "fin"
-			
+			# fin - entorno virtual
 		fi
 	else
 		echo "No, no existe el direcotorio $VIRTUALENVIRONMENT, error para crear el entorno virtual"
 		echo -e "error para crear entorno virtual $NAME_VIRTUALENVIRONMENT \t datetime: $DIA $HORA" >> install.log
 	fi
-	# fin - entorno virtual
-
-	# creando directorios
-	# fin - directorios
 else
 	echo -e "apache: False \t datetime: $DIA $HORA" >> install.log
 	echo "error para instalar apache, no se puede proceder" 
@@ -137,8 +123,7 @@ else
 fi
 
 # instalando php7
-if $PHP
-then
+if $PHP; then
         echo -e "php7: True \t datetime: $DIA $HORA" >> install.log
 else
         echo -e "php7: False \t datetime: $DIA $HORA" >> install.log
@@ -146,4 +131,21 @@ else
         exit
 fi
 
+# instalando postgresql
+if $POSTGRESQL; then
+        echo -e "postgresql: True \t datetime: $DIA $HORA" >> install.log
+else
+        echo -e "postgresql: False \t datetime: $DIA $HORA" >> install.log
+        echo "error para instalar postgresql, no se puede proceder" 
+        exit
+fi
+
+# instalando mysql
+if $MYSQL; then
+        echo -e "mysql: True \t datetime: $DIA $HORA" >> install.log
+else
+        echo -e "mysql: False \t datetime: $DIA $HORA" >> install.log
+        echo "error para instalar mysql, no se puede proceder" 
+        exit
+fi
 
